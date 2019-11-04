@@ -11,11 +11,11 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+@Transactional
 public class PostService {
     @Autowired
     private PostRepository postRepository;
 
-    @Transactional
     public Post createPost(String creatorName, String text) {
         Post post = new Post();
         final Integer postId = post.getId();
@@ -27,7 +27,6 @@ public class PostService {
         return post;
     }
 
-    @Transactional
     public void deletePost(Integer postId) {
         Post post = postRepository.findOneById(postId);
         if (post == null)
@@ -36,12 +35,10 @@ public class PostService {
 
     }
 
-    @Transactional
     public Post findPost(Integer postId) {
         return postRepository.findOneById(postId);
     }
 
-    @Transactional
     public List<Post> getAllPosts() {
         return postRepository.findAll();
     }

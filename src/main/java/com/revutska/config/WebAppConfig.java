@@ -10,11 +10,14 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Properties;
 
@@ -58,14 +61,14 @@ public class WebAppConfig {
         return dataSource;
     }
 
-    @Bean(name = "transactionManager")
-    public DataSourceTransactionManager getTransactionManager() {
-        DataSourceTransactionManager txManager = new DataSourceTransactionManager();
-
-        DataSource dataSource = this.getDataSource();
-        txManager.setDataSource(dataSource);
-
-        return txManager;
+    @Bean
+    @Autowired
+    public JpaTransactionManager transactionManager(LocalContainerEntityManagerFactoryBean emf) throws Exception {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(emf.getObject());
+        // The below line would generate javax.persistence.TransactionRequiredException: no transaction is in progress
+        // transactionManager.setEntityManagerFactory(emf.getNativeEntityManagerFactory());
+        return transactionManager;
     }
 
     @Bean
@@ -80,6 +83,9 @@ public class WebAppConfig {
 
         return entityManagerFactoryBean;
     }
+
+
+
 
     private Properties hibProperties() {
         Properties properties = new Properties();
