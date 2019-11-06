@@ -8,7 +8,6 @@ import java.util.Date;
 @Entity
 @Table(name = "comment")
 public class Comment implements Comparable<Comment> {
-    private static DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

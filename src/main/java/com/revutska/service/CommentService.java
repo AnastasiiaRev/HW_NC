@@ -5,37 +5,39 @@ import com.revutska.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Service
 public class CommentService {
+    private static final String DEFAULT_CREATOR_NAME = "Anonymous";
+
     @Autowired
     private CommentRepository commentRepository;
 
-    public Comment addComment(String creatorName, String text, Integer postId) {
-        Comment comment = new Comment();
+    public void saveCommentToPost(Comment comment) {
+        final Integer commentId = comment.getId();
+        comment.setId(commentId);
         comment.setDateOfCreation(new Date());
-        comment.setCreatorName(creatorName);
-        comment.setText(text);
-        comment.setPostId(postId);
+        if (comment.getCreatorName().trim().equals(""))
+            comment.setCreatorName(DEFAULT_CREATOR_NAME);
         commentRepository.save(comment);
-        return comment;
+    }
+
+    public void deleteAllCommentsFromPost(Integer postId) {
+        commentRepository.deleteByPostId(postId);
     }
 
     public void deleteComment(Integer commentId) {
-        Comment comment = commentRepository.findOneById(commentId);
-        if (comment == null)
-            throw new EntityNotFoundException("Comment not found");
-        commentRepository.delete(comment);
+        commentRepository.deleteById(commentId);
     }
 
-    public void deleteComments(Integer postId) {
-        List<Comment> comments = commentRepository.findAllByPostId(postId);
-        if (comments.isEmpty())
-            throw new EntityNotFoundException("Comments not found");
-        for (Comment comment : comments)
-            commentRepository.delete(comment);
+    public ArrayList<Comment> getAllCommentsForPost(Integer postId) {
+        return commentRepository.findAllByPostId(postId);
+    }
+
+    public Comment getComment(Integer commentId) {
+        return commentRepository.findOneById(commentId);
     }
 }

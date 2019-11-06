@@ -8,16 +8,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.JstlView;
 
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Properties;
 
@@ -41,6 +39,7 @@ public class WebAppConfig {
     @Bean
     public InternalResourceViewResolver getViewResolver() {
         InternalResourceViewResolver vr = new InternalResourceViewResolver();
+        vr.setViewClass(JstlView.class);
         vr.setPrefix("/pages/");
         vr.setSuffix(".jsp");
         return vr;
@@ -49,15 +48,12 @@ public class WebAppConfig {
     @Bean(name = "dataSource")
     public DataSource getDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-
         // See: datasouce-cfg.properties
         dataSource.setDriverClassName(env.getProperty("ds.database-driver"));
         dataSource.setUrl(env.getProperty("ds.url"));
         dataSource.setUsername(env.getProperty("ds.username"));
         dataSource.setPassword(env.getProperty("ds.password"));
-
         System.out.println("## getDataSource: " + dataSource);
-
         return dataSource;
     }
 
@@ -76,16 +72,11 @@ public class WebAppConfig {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setDataSource(getDataSource());
         entityManagerFactoryBean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
-
         entityManagerFactoryBean.setJpaProperties(hibProperties());
         entityManagerFactoryBean.setPackagesToScan("com.revutska.model");
         entityManagerFactoryBean.setPersistenceUnitName("persistence");
-
         return entityManagerFactoryBean;
     }
-
-
-
 
     private Properties hibProperties() {
         Properties properties = new Properties();

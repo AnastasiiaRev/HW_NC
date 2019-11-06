@@ -8,7 +8,6 @@ import java.util.Date;
 @Entity
 @Table(name = "post")
 public class Post {
-    private static DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
